@@ -1,0 +1,145 @@
+-- 1️⃣ Create & use database
+CREATE DATABASE e_commerce;
+USE e_commerce;
+
+-- 2️⃣ Categories
+CREATE TABLE categories (
+    category_id INT PRIMARY KEY,
+    category_name VARCHAR(50)
+);
+
+INSERT INTO categories VALUES
+(1, 'Electronics'),
+(2, 'Fashion'),
+(3, 'Home & Kitchen'),
+(4, 'Books');
+
+-- 3️⃣ Customers
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    full_name VARCHAR(100),
+    email VARCHAR(100),
+    phone VARCHAR(15),
+    gender VARCHAR(10),
+    signup_date DATE,
+    customer_segment VARCHAR(50)
+);
+
+INSERT INTO customers VALUES
+(1, 'Amit Sharma', 'amit@gmail.com', '9876543210', 'Male', '2024-01-15', 'Returning'),
+(2, 'Priya Mehta', 'priya@gmail.com', '9876501234', 'Female', '2024-02-10', 'New'),
+(3, 'Rahul Verma', 'rahul@gmail.com', '9898989898', 'Male', '2023-11-20', 'Premium');
+
+-- 4️⃣ Addresses
+CREATE TABLE addresses (
+    address_id INT PRIMARY KEY,
+    customer_id INT,
+    city VARCHAR(50),
+    state VARCHAR(50),
+    country VARCHAR(50),
+    pincode VARCHAR(10),
+    address_type VARCHAR(20),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+INSERT INTO addresses VALUES
+(1, 1, 'Mumbai', 'Maharashtra', 'India', '400001', 'Home'),
+(2, 2, 'Ahmedabad', 'Gujarat', 'India', '380001', 'Home'),
+(3, 3, 'Bengaluru', 'Karnataka', 'India', '560001', 'Office');
+
+-- 5️⃣ Products
+CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category_id INT,
+    price DECIMAL(10,2),
+    cost_price DECIMAL(10,2),
+    brand VARCHAR(50),
+    is_active BOOLEAN,
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
+);
+
+INSERT INTO products VALUES
+(101, 'Wireless Mouse', 1, 799.00, 500.00, 'Logitech', TRUE),
+(102, 'Bluetooth Headphones', 1, 1999.00, 1300.00, 'Boat', TRUE),
+(103, 'Cotton T-Shirt', 2, 599.00, 300.00, 'H&M', TRUE),
+(104, 'Non-stick Pan', 3, 1499.00, 900.00, 'Prestige', TRUE),
+(105, 'Atomic Habits', 4, 499.00, 250.00, 'Penguin', TRUE);
+
+-- 6️⃣ Orders
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    order_status VARCHAR(30),
+    payment_status VARCHAR(30),
+    total_amount DECIMAL(10,2),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+INSERT INTO orders VALUES
+(1001, 1, '2024-03-01', 'Delivered', 'Paid', 2798.00),
+(1002, 2, '2024-03-05', 'Cancelled', 'Refunded', 599.00),
+(1003, 3, '2024-03-10', 'Delivered', 'Paid', 2498.00);
+
+-- 7️⃣ Order Items
+CREATE TABLE order_items (
+    order_item_id INT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    selling_price DECIMAL(10,2),
+    discount DECIMAL(5,2),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+INSERT INTO order_items VALUES
+(1, 1001, 101, 1, 799.00, 0),
+(2, 1001, 102, 1, 1999.00, 200),
+(3, 1002, 103, 1, 599.00, 0),
+(4, 1003, 104, 1, 1499.00, 0),
+(5, 1003, 105, 2, 499.00, 0);
+
+-- 8️⃣ Payments
+CREATE TABLE payments (
+    payment_id INT PRIMARY KEY,
+    order_id INT,
+    payment_method VARCHAR(30),
+    payment_date DATE,
+    payment_status VARCHAR(30),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+
+INSERT INTO payments VALUES
+(501, 1001, 'UPI', '2024-03-01', 'Success'),
+(502, 1002, 'Credit Card', '2024-03-05', 'Refunded'),
+(503, 1003, 'Net Banking', '2024-03-10', 'Success');
+
+-- 9️⃣ Shipments
+CREATE TABLE shipments (
+    shipment_id INT PRIMARY KEY,
+    order_id INT,
+    shipped_date DATE,
+    delivery_date DATE,
+    shipment_status VARCHAR(30),
+    courier_partner VARCHAR(50),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+
+INSERT INTO shipments VALUES
+(701, 1001, '2024-03-02', '2024-03-04', 'Delivered', 'Delhivery'),
+(702, 1003, '2024-03-11', '2024-03-13', 'Delivered', 'BlueDart');
+
+-- 🔟 Returns
+CREATE TABLE returns (
+    return_id INT PRIMARY KEY,
+    order_item_id INT,
+    return_date DATE,
+    return_reason VARCHAR(100),
+    refund_amount DECIMAL(10,2),
+    FOREIGN KEY (order_item_id) REFERENCES order_items(order_item_id)
+);
+
+INSERT INTO returns VALUES
+(901, 2, '2024-03-06', 'Defective product', 1999.00);
